@@ -70,7 +70,10 @@ class UserController extends Controller
         $count = User::where('email', '=', $email)->count();
 
         if($count==1){
+            // Sending OTP to email
             Mail::to($email)->send(new OTPMail($otp));
+            // Updating OTP in database
+            User::where('email', '=', $email)->update('otp', '=', $otp);
 
         }else{
             return response()->json([
