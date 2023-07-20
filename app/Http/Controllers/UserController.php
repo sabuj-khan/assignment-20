@@ -96,9 +96,9 @@ class UserController extends Controller
 
         if($count == 1){
             //OPT reset
-            User::where('opt', '=', $opt)->update('opt'=>'0');
+            User::where('opt', '=', $opt)->update(['opt'=>'0']);
             // Token create for password setting
-            $token = JWTToken::createToken($request->input('email'));
+            $token = JWTToken::createTokenForSetPassword($request->input('email'));
 
             return response()->json([
                 'status'=>'Success',
@@ -112,6 +112,25 @@ class UserController extends Controller
             ]);
         }
 
+    }
+
+    function resetPassword(Request $request){
+        try{
+            $email = $request->header('email');
+            $password = $request->input('password');
+            User::where('email', '=', $email)->update(['password'=>$password]);
+
+            return response()->json([
+                'status'=>'Success',
+                'message'=>'Password has been reset successfully',
+            ]);
+
+        }catch(Exception $e){
+            return response()->json([
+                'status'=>'Failed',
+                'message'=>'Unauthorized',
+            ]);
+        }
     }
 
 }
