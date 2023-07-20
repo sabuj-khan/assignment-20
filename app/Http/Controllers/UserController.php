@@ -65,15 +65,20 @@ class UserController extends Controller
     }
 
     function sendOTPToEmail(Request $request){
-        $email = $request->input('email');
-        $otp = rand(1000,9999);
-        $count = User::where('email', '=', $email)->count();
+        $email=$request->input('email');
+        $opt=rand(1000,9999);
+        $count=User::where('email','=',$email)->count();
 
         if($count==1){
-            // Sending OTP to email
-            Mail::to($email)->send(new OTPMail($otp));
-            // Updating OTP in database
-            User::where('email', '=', $email)->update('otp', '=', $otp);
+            // OTP Email Address
+            Mail::to($email)->send(new OTPMail($opt));
+            // OTO Code Table Update
+            User::where('email','=',$email)->update(['otp'=>$opt]);
+
+            return response()->json([
+                'status'=>'Success',
+                'message'=>'OTP has been sent to Email',
+            ]);
 
         }else{
             return response()->json([
@@ -81,6 +86,32 @@ class UserController extends Controller
                 'message'=>'Unauthorized user and email not found',
             ]);
         }
+    }
+
+    function optvarification(Request $request){
+        $email = $request->input('email');
+        $opt = $request->input('opt');
+        $count = User::where('email', '=', $email)
+        ->where('opt', '=', $opt)->count();
+
+        if($count == 1){
+            //OPT reset
+            User::where('opt', '=', $opt)->update('opt'=>'0');
+            // Token create for password setting
+            $token = JWTToken::createToken($request->input('email'));
+
+            return response()->json([
+                'status'=>'Success',
+                'message'=>'OPT varification done successfully',
+                'token'=>$token
+            ]);
+        }else{
+            return response()->json([
+                'status'=>'Failed',
+                'message'=>'Unauthorized user and wrong opt code',
+            ]);
+        }
+
     }
 
 }

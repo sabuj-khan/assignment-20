@@ -17,10 +17,10 @@ class OTPMail extends Mailable
      * Create a new message instance.
      */
 
-     public $otp;
-    public function __construct($otp)
+     public $opt;
+    public function __construct($opt)
     {
-        $this->otp=$otp;
+        $this->opt=$opt;
     }
 
     /**
